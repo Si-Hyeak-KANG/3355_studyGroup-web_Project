@@ -1,5 +1,6 @@
 package com.study3355.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,7 +8,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Configuration
 @EnableWebSecurity
@@ -25,10 +28,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public void configure(WebSecurity web) throws Exception {
+    public WebSecurityCustomizer webSecurityCustomizer() throws Exception {
         // static resource security filter 를 적용하지마라
-        web.ignoring()
-                .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+        return web -> web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
 }
