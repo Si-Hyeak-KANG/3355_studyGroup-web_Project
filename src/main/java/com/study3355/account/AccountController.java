@@ -1,6 +1,9 @@
 package com.study3355.account;
 
+import com.study3355.domain.Account;
 import lombok.RequiredArgsConstructor;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
@@ -17,6 +20,8 @@ import javax.validation.Valid;
 public class AccountController {
 
     private final SignUpFormValidator signUpFormValidator;
+    private final AccountRepository accountRepository;
+    private final JavaMailSender javaMailSender;
 
     // 바인딩 된 데이터를 받을 때, 유효성 검증 진행
     // ModelAttribute 의 타입과 InitBinder 의 문자열값과 동일
@@ -45,6 +50,30 @@ public class AccountController {
         if(errors.hasErrors()) {
             return "account/sign-up";
         } // front 단에서만 진행되는 유효성 검증은 뚫릴 수 있음.(javascript 조작) 따라서 서버단에서도 검증해야함
+
+        Account account = Account.builder()
+                .email(signUpForm.getEmail())
+                .nickname(signUpForm.getNickname())
+                .password(signUpForm.getPassword()) // TODO encoding
+                .studyCreatedByWeb(true)
+                .studyEnrollmentResultByWeb(true)
+                .studyUpdatedByWeb(true)
+                .build();
+
+        Account newAccount = accountRepository.save(account);
+
+        newAccount.generateEmailCheckToken();
+
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(newAccount.getEmail());
+        mailMessage.setSubject("삼삼오오, 회원 가입 인증"); // 메일의 제목
+        mailMessage.setText(
+                "/check-email-token?token=" + newAccount.getEmailCheckToken()
+                + "&email=" + newAccount.getEmail()
+        ); // 메일의 본문
+
+        javaMailSender.send(mailMessage); // 심플 메일 전송
+
         // TODO 회원 가입 처리
        return "redirect:/";
     }

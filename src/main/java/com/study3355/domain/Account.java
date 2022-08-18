@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * 도메인 : 계정
@@ -76,4 +77,9 @@ public class Account {
     private boolean studyEnrollmentResultByWeb;
     private boolean studyUpdatedByEmail;
     private boolean studyUpdatedByWeb;
+
+    // 이메일 인증 토큰 수령
+    public void generateEmailCheckToken() {
+        this.emailCheckToken = UUID.randomUUID().toString();
+    }
 }
