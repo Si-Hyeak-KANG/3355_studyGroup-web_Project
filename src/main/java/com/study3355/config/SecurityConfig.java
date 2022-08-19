@@ -16,6 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    // 기본적으론 CSRF(Cross-Site Request Forgery)가 활성화되어있음
+    // 타사이트에서 form 요청을 보내는 것을 방어
+    // Thymeleaf 템플릿으로 만들경우, CSRF 토큰 기능을 지원
+    // 따라서 토큰없이 데이터가 들어온다면, 403 에러 발생
     @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
