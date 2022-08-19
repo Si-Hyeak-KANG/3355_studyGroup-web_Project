@@ -69,6 +69,7 @@ class AccountControllerTest {
         Account account = accountRepository.findByEmail("test@test.com");
         assertNotNull(account);
         assertNotEquals(account.getPassword(),"12345678"); // 패스워드 인코딩 체크
+        assertNotNull(account.getEmailCheckToken()); // 토큰이 있는지 체크
 
         assertTrue(accountRepository.existsByEmail("test@test.com"));
 

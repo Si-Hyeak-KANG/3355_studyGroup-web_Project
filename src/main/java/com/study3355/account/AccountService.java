@@ -6,6 +6,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +16,9 @@ public class AccountService {
     private final JavaMailSender javaMailSender;
     private final PasswordEncoder passwordEncoder;
 
+    // JPA persist, JPA detached 상태가 주는 영향(버그)
+    // save가 끝난 이후이기 때문에 Transactional 범위를 벗어난 상태
+    @Transactional
     public void processNewAccount(SignUpForm signUpForm) {
         Account newAccount = saveNewAccount(signUpForm);
         newAccount.generateEmailCheckToken();
@@ -31,8 +35,7 @@ public class AccountService {
                 .studyUpdatedByWeb(true)
                 .build();
 
-        Account newAccount = accountRepository.save(account);
-        return newAccount;
+        return accountRepository.save(account);
     }
 
     // 메서드로 빼는 기능 -> Ctrl + Alt M
