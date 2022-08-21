@@ -68,14 +68,14 @@ public class AccountController {
             model.addAttribute("error","wrong.email");
             return view;
         }
-
-        if(!account.getEmailCheckToken().equals(token)) {
+        // (리팩토링) 로직 메서드화를 통해 긴 코드를 간결화
+        if(!account.isValidToken(token)) {
             model.addAttribute("error","wrong.token");
             return view;
         }
 
-        account.setEmailVerified(true); // 인증여부 true
-        account.setJoinedAt(LocalDateTime.now()); // 가입 날짜 적용
+        account.completeSignUp(); // (리팩토링)로직을 추가하므로써, sign up이 완료가 되는구나라고 바로 직관적으로 알 수 있음.
+
         model.addAttribute("numberOfUser", accountRepository.count()); // 몇번째 유저인가
         model.addAttribute("nickname", account.getNickname());
 

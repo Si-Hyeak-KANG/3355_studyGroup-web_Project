@@ -78,8 +78,19 @@ public class Account {
     private boolean studyUpdatedByEmail;
     private boolean studyUpdatedByWeb;
 
+    // Business Logic
+
     // 이메일 인증 토큰 수령
     public void generateEmailCheckToken() {
         this.emailCheckToken = UUID.randomUUID().toString();
+    }
+
+    public void completeSignUp() {
+        this.setEmailVerified(true); // 인증여부 true
+        this.setJoinedAt(LocalDateTime.now()); // 가입 날짜 적용
+    }
+
+    public boolean isValidToken(String token) {
+        return this.emailCheckToken.equals(token);
     }
 }
