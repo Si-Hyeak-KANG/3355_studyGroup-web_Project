@@ -1,16 +1,13 @@
 package com.study3355.config;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Configuration
 @EnableWebSecurity
@@ -22,6 +19,7 @@ public class SecurityConfig {
     // 따라서 토큰없이 데이터가 들어온다면, 403 에러 발생
     @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
+
         http.authorizeRequests()
                 .mvcMatchers("/", "/login", "/sign-up", "/check-email", "/check-email-token",
                         "/email-login", "/check-email-login", "login-link").permitAll()

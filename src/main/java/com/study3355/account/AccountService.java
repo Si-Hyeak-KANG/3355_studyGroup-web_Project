@@ -16,7 +16,7 @@ public class AccountService {
     private final JavaMailSender javaMailSender;
     private final PasswordEncoder passwordEncoder;
 
-    // JPA persist, JPA detached 상태가 주는 영향(버그)
+    // JPA persist, JPA detached 상태가 주는 영향(버그) -> detached 객체는 떨어져 있는 객체
     // save가 끝난 이후이기 때문에 Transactional 범위를 벗어난 상태
     @Transactional
     public void processNewAccount(SignUpForm signUpForm) {

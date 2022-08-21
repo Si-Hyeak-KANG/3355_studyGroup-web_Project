@@ -7,11 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -21,6 +20,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
 class AccountControllerTest {
@@ -31,13 +31,57 @@ class AccountControllerTest {
     @MockBean
     JavaMailSender javaMailSender;
 
+    // 인증 메일 확인 테스트
+
+    @Test
+    @DisplayName("인증 메일 확인 - 입력값 오류")
+    public void checkEmailToken_with_wrong_input() throws Exception {
+        //given
+        mockMvc.perform(
+                get("/check-email-token")
+                        .param("token","qwerqwer")
+                        .param("email","test@test.com")
+                )
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("error"))
+                .andExpect(view().name("account/checked-email"));
+    }
+
+    @Test
+    @DisplayName("인증 메일 확인 - 입력값 정상")
+    void checkEmailToken_correct_input() throws Exception {
+
+        //given
+        Account account = Account.builder()
+                .email("test@test.com")
+                .password("12345678")
+                .nickname("test")
+                .build();
+        Account newAccount = accountRepository.save(account);
+        newAccount.generateEmailCheckToken();
+
+        //when
+        mockMvc.perform(
+                get("/check-email-token")
+                .param("token", newAccount.getEmailCheckToken())
+                .param("email", newAccount.getEmail())
+                )
+                .andExpect(status().isOk())
+                .andExpect(model().attributeDoesNotExist("error"))
+                .andExpect(model().attributeExists("nickname"))
+                .andExpect(model().attributeExists("numberOfUser"))
+                .andExpect(view().name("account/checked-email"));
+
+
+    }
+
+    // 회원 가입 처리 테스트
+
     @Test
     @DisplayName("회원 가입 화면 보이는지 테스트")
-    @WithMockUser // 401 UnAuthorized 에러 방지
     void signUpForm() throws Exception {
 
-        mockMvc.perform(get("/sign-up")
-                        .accept(MediaType.TEXT_HTML))
+        mockMvc.perform(get("/sign-up"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("account/sign-up"))
                 .andExpect(model().attributeExists("signUpForm"));
@@ -50,7 +94,7 @@ class AccountControllerTest {
                 .param("nickname","james")
                 .param("email","errorEmail..")
                 .param("password","12345")
-                        .with(csrf())) // csrf로 인한 403 에러 방지
+                .with(csrf())) // csrf로 인한 403 에러 방지
                 .andExpect(status().isOk())
                 .andExpect(view().name("account/sign-up"));
     }
@@ -62,7 +106,8 @@ class AccountControllerTest {
                         .param("nickname","james")
                         .param("email","test@test.com")
                         .param("password","12345678")
-                        .with(csrf())) // csrf로 인한 403 에러 방지
+                        .with(csrf())
+                )
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/"));
 
