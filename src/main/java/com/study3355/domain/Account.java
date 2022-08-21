@@ -79,6 +79,7 @@ public class Account {
     private boolean studyUpdatedByWeb;
 
     // Business Logic
+    // 도메인 객체에 대한 비즈니스 로직이 있다고 하면 서비스 계층에 작성하는 것보다, 해당 도메인에 작성
 
     // 이메일 인증 토큰 수령
     public void generateEmailCheckToken() {

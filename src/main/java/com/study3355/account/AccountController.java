@@ -53,7 +53,8 @@ public class AccountController {
             return "account/sign-up";
         } // front 단에서만 진행되는 유효성 검증은 뚫릴 수 있음.(javascript 조작) 따라서 서버단에서도 검증해야함
 
-        accountService.processNewAccount(signUpForm);
+        Account account = accountService.processNewAccount(signUpForm);
+        accountService.login(account);
 
 
         // TODO 회원 가입 처리
@@ -75,6 +76,7 @@ public class AccountController {
         }
 
         account.completeSignUp(); // (리팩토링)로직을 추가하므로써, sign up이 완료가 되는구나라고 바로 직관적으로 알 수 있음.
+        accountService.login(account);
 
         model.addAttribute("numberOfUser", accountRepository.count()); // 몇번째 유저인가
         model.addAttribute("nickname", account.getNickname());
