@@ -22,7 +22,7 @@ public class SecurityConfig {
 
         http.authorizeRequests()
                 .mvcMatchers("/", "/login", "/sign-up", "/check-email", "/check-email-token",
-                        "/email-login", "/check-email-login", "login-link").permitAll()
+                        "/email-login", "/check-email-login", "/login-link").permitAll()
                 .mvcMatchers(HttpMethod.GET, "/profile/*").permitAll()
                 .anyRequest().authenticated();
 
@@ -32,8 +32,10 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() throws Exception {
         // static resource security filter 를 적용하지마라
-        return web -> web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+        // static 에서 흔히 사용되는 위치
+        return web -> web.ignoring()
+                .mvcMatchers("/node_modules/**")
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
 }
-

@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '2.7.2'
     id 'io.spring.dependency-management' version '1.0.12.RELEASE'
     id 'java'
+    id "org.siouan.frontend-jdk11" version "4.0.0"
 }
 
 group = 'com.project'
@@ -16,6 +17,7 @@ configurations {
 
 repositories {
     mavenCentral()
+    gradlePluginPortal()
 }
 
 dependencies {
@@ -26,6 +28,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5' // Thymeleaf와 Spring Security를 Integeration
+
+    // npm
+    implementation 'com.github.node-gradle:gradle-node-plugin:2.2.3'
 
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -37,6 +44,24 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
+/**
+ * npm install start
+ */
+apply plugin: 'org.siouan.frontend-jdk11'
+
+frontend {
+
+    nodeDistributionProvided = false
+
+    nodeInstallDirectory = file("${project.projectDir}/src/main/resources/static/node")
+
+    packageJsonDirectory = file("${project.projectDir}/src/main/resources/static")
+
+    nodeVersion = '15.3.0'
+
+    assembleScript = 'run build'
+
+    cleanScript = 'run clean'
+
+    checkScript = 'run check'
 }
