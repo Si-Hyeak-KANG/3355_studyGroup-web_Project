@@ -53,6 +53,8 @@ public class Account {
 
     private String emailCheckToken; // 이메일 인증 시 필요한 토큰값
 
+    private LocalDateTime emailCheckTokenGeneratedAt;
+
     // 프로필
 
     private LocalDateTime joinedAt;
@@ -66,7 +68,8 @@ public class Account {
     private String location;
 
     // 기본적으로 db 에서 String 은 Varchar(255), 이미지가 커질수 있기때문에 애너테이션 적용
-    @Lob @Basic(fetch= FetchType.EAGER)
+    @Lob
+    @Basic(fetch = FetchType.EAGER)
     private String profileImage;
 
     // 알림 설정
@@ -84,6 +87,7 @@ public class Account {
     // 이메일 인증 토큰 수령
     public void generateEmailCheckToken() {
         this.emailCheckToken = UUID.randomUUID().toString();
+        this.emailCheckTokenGeneratedAt = LocalDateTime.now();
     }
 
     public void completeSignUp() {
@@ -93,5 +97,9 @@ public class Account {
 
     public boolean isValidToken(String token) {
         return this.emailCheckToken.equals(token);
+    }
+
+    public boolean canSendConfirmEmail() {
+        return this.emailCheckTokenGeneratedAt.isBefore(LocalDateTime.now().minusHours(1));
     }
 }
