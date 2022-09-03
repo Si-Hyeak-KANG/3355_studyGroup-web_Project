@@ -26,6 +26,12 @@ public class SecurityConfig {
                 .mvcMatchers(HttpMethod.GET, "/profile/*").permitAll()
                 .anyRequest().authenticated();
 
+        http.formLogin()
+                .loginPage("/login").permitAll();
+
+        http.logout()
+                .logoutSuccessUrl("/");
+
         return http.build();
     }
 
@@ -34,7 +40,7 @@ public class SecurityConfig {
         // static resource security filter 를 적용하지마라
         // static 에서 흔히 사용되는 위치
         return web -> web.ignoring()
-                .mvcMatchers("/node_modules/**")
+                .mvcMatchers("/node_modules/**","/error")
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
