@@ -67,7 +67,7 @@ public class AccountService {
         // 실제로 AuthenticationManager 와 같은 동작
         UsernamePasswordAuthenticationToken token =
                 new UsernamePasswordAuthenticationToken(
-                        account.getNickname(),
+                        new UserAccount(account),
                         account.getPassword(),
                         List.of(new SimpleGrantedAuthority("Role_USER")));
         SecurityContext context = SecurityContextHolder.getContext();
