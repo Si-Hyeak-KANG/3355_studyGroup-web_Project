@@ -19,6 +19,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AccountService implements UserDetailsService {
 
     private final AccountRepository accountRepository;
@@ -30,7 +31,6 @@ public class AccountService implements UserDetailsService {
 
     // JPA persist, JPA detached 상태가 주는 영향(버그) -> detached 객체는 떨어져 있는 객체
     // save가 끝난 이후이기 때문에 Transactional 범위를 벗어난 상태
-    @Transactional
     public Account processNewAccount(SignUpForm signUpForm) {
         Account newAccount = saveNewAccount(signUpForm);
         newAccount.generateEmailCheckToken();
@@ -85,6 +85,7 @@ public class AccountService implements UserDetailsService {
 
     }
 
+    @Transactional(readOnly = true)
     @Override
     public UserDetails loadUserByUsername(String emailOrUsername) throws UsernameNotFoundException {
 
@@ -100,5 +101,10 @@ public class AccountService implements UserDetailsService {
 
         // Principal 에 해당하는 객체 반환
         return new UserAccount(account);
+    }
+
+    public void completeSignUp(Account account) {
+        account.completeSignUp();
+        login(account);
     }
 }

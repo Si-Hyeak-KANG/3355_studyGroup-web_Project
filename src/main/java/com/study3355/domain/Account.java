@@ -61,7 +61,7 @@ public class Account {
 
     private String bio;
 
-    private String ulr;
+    private String url;
 
     private String occupation;
 

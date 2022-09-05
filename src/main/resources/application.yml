@@ -1,3 +1,9 @@
 spring:
   profiles:
     active: local
+
+# 세션 유지 시간 기본값
+#server:
+#  servlet:
+#    session:
+#      timeout: 30m

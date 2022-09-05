@@ -11,6 +11,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.validation.Valid;
@@ -75,8 +76,15 @@ public class AccountController {
             return view;
         }
 
+        /*// 현재 여기는 트랜잭션이 없음
+        // 트랜잭션은 서비스에 위임해서 관리할것
         account.completeSignUp(); // (리팩토링)로직을 추가하므로써, sign up이 완료가 되는구나라고 바로 직관적으로 알 수 있음.
         accountService.login(account);
+
+        // 객체의 변경사항이 db에 적용 안됨.
+        // 영속성 컨텍스트 db에서 읽어오는 persist한 객체를 관리하는 객체*/
+
+        accountService.completeSignUp(account);
 
         model.addAttribute("numberOfUser", accountRepository.count()); // 몇번째 유저인가
         model.addAttribute("nickname", account.getNickname());
@@ -100,5 +108,17 @@ public class AccountController {
 
         accountService.sendSignUpConfirmEmail(account);
         return "redirect:/";
+    }
+
+    @GetMapping("/profile/{nickname}")
+    public String viewProfile(@PathVariable String nickname, Model model, @CurrentUser Account account) {
+        Account byNickname = accountRepository.findByNickname(nickname);
+        if(byNickname == null) {
+            throw new IllegalAccessError(nickname + "에 해당하는 사용자가 없습니다.");
+        }
+
+        model.addAttribute("account", byNickname);
+        model.addAttribute("isOwner",byNickname.equals(account));
+        return "account/profile";
     }
 }

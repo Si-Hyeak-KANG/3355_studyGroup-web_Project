@@ -1,5 +1,7 @@
 package com.study3355.config;
 
+import com.study3355.account.AccountService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,10 +10,18 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+
+import javax.sql.DataSource;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final AccountService accountService;
+    private final DataSource dataSource;
 
     // 기본적으론 CSRF(Cross-Site Request Forgery)가 활성화되어있음
     // 타사이트에서 form 요청을 보내는 것을 방어
@@ -31,8 +41,22 @@ public class SecurityConfig {
 
         http.logout()
                 .logoutSuccessUrl("/");
+        // hashing 기반 토큰 방식 -> 위험
+        //http.rememberMe().key("qwert");
+
+        http.rememberMe()
+                .userDetailsService(accountService)
+                .tokenRepository(tokenRepository()); // username, 토큰(랜덤), 시리즈(랜덤, 고정)
 
         return http.build();
+    }
+
+    @Bean
+    public PersistentTokenRepository tokenRepository() {
+        JdbcTokenRepositoryImpl jdbcTokenRepository = new JdbcTokenRepositoryImpl();
+        jdbcTokenRepository.setDataSource(dataSource);
+        // JdbcTokenRepositoryImpl의 메서드를 사용하기 위해선 구현체에서 명시한 테이블이 있어야함.
+        return jdbcTokenRepository;
     }
 
     @Bean

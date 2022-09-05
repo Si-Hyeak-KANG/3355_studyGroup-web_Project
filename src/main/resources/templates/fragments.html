@@ -53,7 +53,7 @@
             </li>
             <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
                 <a class="nav-link dropdown-toggle" id="userDropdown" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">
+                   aria-haspopup="true" aria-expanded="false" aria-hidden="true">
                     <svg data-jdenticon-value="user127" th:data-jdenticon-value="${#authentication.name}"
                          width="24" height="24" class="rounded border bg-light"></svg>
                 </a>
@@ -75,8 +75,8 @@
 </nav>
 
 <footer th:fragment="footer">
-    <div class="row justify-content-center">
-        <img class="mb-2" src="/images/logo_long_kr.jpg" alt="" width="100">
+    <div class="row justify-content-center" style="width: 150px">
+        <img class="mb-2" src="/images/logo_kr_horizontal.png" alt="" width="100">
         <small class="d-block mb-3 text-muted">&copy; 2020</small>
     </div>
 </footer>
