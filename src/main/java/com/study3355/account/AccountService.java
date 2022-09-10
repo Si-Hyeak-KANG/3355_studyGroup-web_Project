@@ -17,6 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * 데이터 변경은 서비스 계층으로 위임해서 트랜잭션 안에서 처리
+ * 데이터 조회는 레파지톨리 또는 서비스 사용
+ * 데이터를 조회하는 것은 굳이 트랜잭션이 없어도 됨. 그래서 view를 렌더링할때 LAZY 로딩 가능
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
