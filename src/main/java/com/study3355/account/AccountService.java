@@ -120,7 +120,7 @@ public class AccountService implements UserDetailsService {
         account.setLocation(profile.getLocation());
         account.setOccupation(profile.getOccupation());
         // TODO 프로필 이미지
-
+        account.setProfileImage(profile.getProfileImage());
         accountRepository.save(account);
     }
 }
