@@ -1,6 +1,7 @@
 package com.study3355.account;
 
 import com.study3355.domain.Account;
+import com.study3355.settings.Notifications;
 import com.study3355.settings.Profile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
@@ -128,5 +129,15 @@ public class AccountService implements UserDetailsService {
         account.setPassword(passwordEncoder.encode(newPassword));
 
         accountRepository.save(account);
+    }
+
+    public void updateNotifications(Account account, Notifications notifications) {
+            account.setStudyCreatedByWeb(notifications.isStudyCreatedByWeb());
+            account.setStudyCreatedByEmail(notifications.isStudyCreatedByEmail());
+            account.setStudyUpdatedByWeb(notifications.isStudyUpdatedByWeb());
+            account.setStudyUpdatedByEmail(notifications.isStudyUpdatedByEmail());
+            account.setStudyEnrollmentResultByEmail(notifications.isStudyEnrollmentResultByEmail());
+            account.setStudyEnrollmentResultByWeb(notifications.isStudyEnrollmentResultByWeb());
+            accountRepository.save(account);
     }
 }

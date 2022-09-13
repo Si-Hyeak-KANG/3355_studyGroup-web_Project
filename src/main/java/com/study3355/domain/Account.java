@@ -75,11 +75,11 @@ public class Account {
     // 알림 설정
 
     private boolean studyCreatedByEmail;
-    private boolean studyCreatedByWeb;
+    private boolean studyCreatedByWeb = true;
     private boolean studyEnrollmentResultByEmail;
-    private boolean studyEnrollmentResultByWeb;
+    private boolean studyEnrollmentResultByWeb = true;
     private boolean studyUpdatedByEmail;
-    private boolean studyUpdatedByWeb;
+    private boolean studyUpdatedByWeb = true;
 
     // Business Logic
     // 도메인 객체에 대한 비즈니스 로직이 있다고 하면 서비스 계층에 작성하는 것보다, 해당 도메인에 작성
