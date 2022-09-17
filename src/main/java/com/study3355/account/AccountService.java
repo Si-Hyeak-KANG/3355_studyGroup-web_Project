@@ -1,12 +1,11 @@
 package com.study3355.account;
 
 import com.study3355.domain.Account;
-import com.study3355.settings.Notifications;
-import com.study3355.settings.Profile;
+import com.study3355.settings.form.Notifications;
+import com.study3355.settings.form.Profile;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.NameTokenizers;
-import org.modelmapper.spi.NameTokenizer;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -156,7 +155,13 @@ public class AccountService implements UserDetailsService {
         modelMapper.getConfiguration()
                         .setDestinationNameTokenizer(NameTokenizers.UNDERSCORE)
                                 .setSourceNameTokenizer(NameTokenizers.UNDERSCORE);
-        
+
         accountRepository.save(account);
+    }
+
+    public void updateNickname(Account account, String nickname) {
+        account.setNickname(nickname);
+        accountRepository.save(account);
+        login(account);
     }
 }
