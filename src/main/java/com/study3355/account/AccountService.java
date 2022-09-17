@@ -4,6 +4,9 @@ import com.study3355.domain.Account;
 import com.study3355.settings.Notifications;
 import com.study3355.settings.Profile;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.NameTokenizers;
+import org.modelmapper.spi.NameTokenizer;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,6 +35,7 @@ public class AccountService implements UserDetailsService {
     private final AccountRepository accountRepository;
     private final JavaMailSender javaMailSender;
     private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
     // manager 주입을 받기위해선 security config 설정을 바꿔줘야함.
     //private final AuthenticationManager authenticationManager;
@@ -116,12 +120,15 @@ public class AccountService implements UserDetailsService {
     }
 
     public void updateProfile(Account account, Profile profile) {
-        account.setUrl(profile.getUrl());
+
+        modelMapper.map(profile,account);
+
+        /*account.setUrl(profile.getUrl());
         account.setBio(profile.getBio());
         account.setLocation(profile.getLocation());
         account.setOccupation(profile.getOccupation());
         // TODO 프로필 이미지
-        account.setProfileImage(profile.getProfileImage());
+        account.setProfileImage(profile.getProfileImage());*/
         accountRepository.save(account);
     }
 
@@ -132,12 +139,24 @@ public class AccountService implements UserDetailsService {
     }
 
     public void updateNotifications(Account account, Notifications notifications) {
-            account.setStudyCreatedByWeb(notifications.isStudyCreatedByWeb());
-            account.setStudyCreatedByEmail(notifications.isStudyCreatedByEmail());
-            account.setStudyUpdatedByWeb(notifications.isStudyUpdatedByWeb());
-            account.setStudyUpdatedByEmail(notifications.isStudyUpdatedByEmail());
-            account.setStudyEnrollmentResultByEmail(notifications.isStudyEnrollmentResultByEmail());
-            account.setStudyEnrollmentResultByWeb(notifications.isStudyEnrollmentResultByWeb());
-            accountRepository.save(account);
+        /*account.setStudyCreatedByWeb(notifications.isStudyCreatedByWeb());
+        account.setStudyCreatedByEmail(notifications.isStudyCreatedByEmail());
+        account.setStudyUpdatedByWeb(notifications.isStudyUpdatedByWeb());
+        account.setStudyUpdatedByEmail(notifications.isStudyUpdatedByEmail());
+        account.setStudyEnrollmentResultByEmail(notifications.isStudyEnrollmentResultByEmail());
+        account.setStudyEnrollmentResultByWeb(notifications.isStudyEnrollmentResultByWeb());*/
+
+        // 하지만 modelMapper 가 가끔 카멜표기 같은 필드이름들을 잘 못찾는 경우가 있음
+       modelMapper.map(notifications,account);
+
+       // 따라서 몇 가지 설정 필요
+        ModelMapper modelMapper = new ModelMapper();
+
+        // 이름이 underscore 가 아니면 하나의 프로퍼티로 간주
+        modelMapper.getConfiguration()
+                        .setDestinationNameTokenizer(NameTokenizers.UNDERSCORE)
+                                .setSourceNameTokenizer(NameTokenizers.UNDERSCORE);
+        
+        accountRepository.save(account);
     }
 }

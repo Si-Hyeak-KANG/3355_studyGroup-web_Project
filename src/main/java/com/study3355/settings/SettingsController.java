@@ -4,6 +4,7 @@ import com.study3355.account.AccountService;
 import com.study3355.account.CurrentUser;
 import com.study3355.domain.Account;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -34,13 +35,15 @@ public class SettingsController {
     static final String SETTINGS_NOTIFICATIONS_VIEW_NAME = "settings/notifications";
     static final String SETTINGS_NOTIFICATIONS_URL = "/settings/notifications";
 
-
     private final AccountService accountService;
+    private final ModelMapper modelMapper;
 
     @GetMapping(SETTINGS_PROFILE_URL)
     public String profileUpdateForm(@CurrentUser Account account, Model model) {
         model.addAttribute(account);
-        model.addAttribute(new Profile(account));
+        // modelMapper는 객체만 받는게 아니라, 타입이나 특정한 클래스를 받을 수 있음
+        // 클래스의 인스턴스를 만들어서 넣어주면 됨
+        model.addAttribute(modelMapper.map(account,Profile.class));
         return SETTINGS_PROFILE_VIEW_NAME;
     }
 
@@ -87,7 +90,7 @@ public class SettingsController {
     @GetMapping(SETTINGS_NOTIFICATIONS_URL)
     public String updateNotificationsForm(@CurrentUser Account account, Model model) {
         model.addAttribute(account);
-        model.addAttribute(new Notifications(account));
+        model.addAttribute(modelMapper.map(account,Notifications.class));
         return SETTINGS_NOTIFICATIONS_VIEW_NAME;
     }
 
