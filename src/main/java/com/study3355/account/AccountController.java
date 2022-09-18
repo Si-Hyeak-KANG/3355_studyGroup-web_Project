@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
@@ -66,13 +67,13 @@ public class AccountController {
     public String checkEmailToken(String token, String email, Model model) {
         Account account = accountRepository.findByEmail(email);
         String view = "account/checked-email";
-        if(account == null) {
-            model.addAttribute("error","wrong.email");
+        if (account == null) {
+            model.addAttribute("error", "wrong.email");
             return view;
         }
         // (리팩토링) 로직 메서드화를 통해 긴 코드를 간결화
-        if(!account.isValidToken(token)) {
-            model.addAttribute("error","wrong.token");
+        if (!account.isValidToken(token)) {
+            model.addAttribute("error", "wrong.token");
             return view;
         }
 
@@ -94,14 +95,14 @@ public class AccountController {
 
     @GetMapping("/check-email")
     public String checkEmil(@CurrentUser Account account, Model model) {
-        model.addAttribute("email",account.getEmail());
+        model.addAttribute("email", account.getEmail());
         return "account/check-email";
     }
 
     @GetMapping("/resend-confirm-email")
     public String resendConfirmEmail(@CurrentUser Account account, Model model) {
-        if(!account.canSendConfirmEmail()) {
-            model.addAttribute("error","인증 이메일은 1시간에 한번만 전송할 수 있습니다.");
+        if (!account.canSendConfirmEmail()) {
+            model.addAttribute("error", "인증 이메일은 1시간에 한번만 전송할 수 있습니다.");
             model.addAttribute("email", account.getEmail());
             return "account/check-email";
         }
@@ -113,12 +114,50 @@ public class AccountController {
     @GetMapping("/profile/{nickname}")
     public String viewProfile(@PathVariable String nickname, Model model, @CurrentUser Account account) {
         Account byNickname = accountRepository.findByNickname(nickname);
-        if(byNickname == null) {
+        if (byNickname == null) {
             throw new IllegalAccessError(nickname + "에 해당하는 사용자가 없습니다.");
         }
 
         model.addAttribute("account", byNickname);
-        model.addAttribute("isOwner",byNickname.equals(account));
+        model.addAttribute("isOwner", byNickname.equals(account));
         return "account/profile";
     }
+
+    @GetMapping("/email-login")
+    public String emailLoginForm() {
+        return "account/email-login";
+    }
+
+    @PostMapping("/email-login")
+    public String sendEmailLoginLink(String email, Model model, RedirectAttributes attributes) {
+
+        Account account = accountRepository.findByEmail(email);
+        if (account == null) {
+            model.addAttribute("error", "유효한 이메일 주소가 아닙니다.");
+            return "account/email-login";
+        }
+
+        if (!account.canSendConfirmEmail()) {
+            model.addAttribute("error", "이메일 로그인은 1시간 뒤에 사용할 수 있습니다.");
+            //return "account/email-login";
+        }
+
+        accountService.sendLoginLink(account);
+        attributes.addFlashAttribute("message", "이메일 인증 메일을 발송했습니다.");
+        return "redirect:/email-login";
+    }
+
+    @GetMapping("/login-by-email")
+    public String loginByEmail(String token, String email, Model model) {
+        Account account = accountRepository.findByEmail(email);
+        String view = "account/logged-in-by-email";
+        if (account == null || !account.isValidToken(token)) {
+            model.addAttribute("error","로그인할 수 없습니다.");
+            return view;
+        }
+        accountService.login(account);
+        return view;
+    }
+
+
 }
