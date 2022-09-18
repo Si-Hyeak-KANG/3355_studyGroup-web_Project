@@ -1,6 +1,28 @@
 spring:
   profiles:
     active: local
+  # 개발 때에만 Create-drop 또는 update 사용, 운영환경에서는 validate 사용
+  # schema 를 직접 관리해야함. 따라서 validate 를 사용해서 매핑이 잘되나 등 검증, 실패시 실행 X
+  # update 는 종료를 해도 값이 저장되지만, 필드가 변경되면 그대로 새로운 컬럼을 추가
+  jpa:
+    hibernate:
+      ddl-auto: create-drop # 스키마 자동 생성
+    # 개발시 SQL 로깅을 하여 어떤 값으로 어떤 SQL이 실행되는지 확인
+    properties:
+      hibernate:
+        format_sql: true # SQL pretty print
+    show-sql: true # SQL 쿼리 출력
+
+
+logging:
+  level:
+    org:
+      springframework:
+        orm:
+          jpa: DEBUG
+
+
+
 server:
   port:
     9050
