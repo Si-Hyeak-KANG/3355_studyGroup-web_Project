@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -81,6 +82,11 @@ public class Account {
     private boolean studyUpdatedByEmail;
     private boolean studyUpdatedByWeb = true;
 
+    // 관계형 DB 에는 다대다가 혀용되지 않음
+    // 그래서 Account_Tag 조인 테이블이 생성됨.
+    @ManyToMany
+    private Set<Tag> tags;
+    
     // Business Logic
     // 도메인 객체에 대한 비즈니스 로직이 있다고 하면 서비스 계층에 작성하는 것보다, 해당 도메인에 작성
 
