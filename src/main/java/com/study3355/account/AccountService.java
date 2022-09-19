@@ -1,6 +1,7 @@
 package com.study3355.account;
 
 import com.study3355.domain.Account;
+import com.study3355.domain.Tag;
 import com.study3355.settings.form.Notifications;
 import com.study3355.settings.form.Profile;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 데이터 변경은 서비스 계층으로 위임해서 트랜잭션 안에서 처리
@@ -173,5 +175,12 @@ public class AccountService implements UserDetailsService {
         mailMessage.setText("/login-by-email?token=" + account.getEmailCheckToken() +
                 "&email=" + account.getEmail());
         javaMailSender.send(mailMessage);
+    }
+
+    public void addTag(Account account, Tag tag) {
+        Optional<Account> byId = accountRepository.findById(account.getId()); // EAGER fetch
+        byId.ifPresent(a -> a.getTags().add(tag));
+
+        // repository.getOne() -> LAZY 로딩, 필요한 순간에만 읽어옴.
     }
 }
