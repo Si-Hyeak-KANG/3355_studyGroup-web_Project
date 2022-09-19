@@ -177,7 +177,7 @@ public class SettingsController {
             return ResponseEntity.badRequest().build();
         }
 
-        accountService.removeTag(account,tag);
+        accountService.removeTag(account,tag); // 태그 자체에서 삭제하는 것이 아닌, 유저가 체크한 태그만 제거
         return ResponseEntity.ok().build();
     }
 }
